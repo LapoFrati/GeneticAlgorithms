@@ -2,20 +2,24 @@ import random
 import numpy as np
 import math
 import typing as tp
+import copy
 Location = tp.Tuple[int, int]
 
 behaviours = []
 
 
 class World():
-    def __init__(self, world_size, pop_size, mutation_rate):
+    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range):
         self.world_size = world_size
         self.world = np.zeros((world_size, world_size), dtype=int)
         self.peak_resource = 255
         self.bin_size = self.peak_resource // 4
+        # mutation rate: μ
         self.mutation_rate = mutation_rate
-        self.meta_mutation = 0          # mutation rate of mutation: μ_μ
-        self.meta_mutation_range = 0    # mutation rate varies in [μ-ε,μ+ε]: ε
+        # mutation rate of mutation: μ_μ
+        self.meta_mutation = meta_mutation
+        # mutation rate varies in [μ-ε,μ+ε]: ε
+        self.meta_mutation_range = meta_mutation_range
         # possible behaviours are 1-15 steps in 8 compass direction + (0,0)
         self.behaviours = [(0, 0)]
         for inc in range(1, 16):
@@ -31,7 +35,8 @@ class World():
         self.population = []
         for i in range(0, pop_size):
             self.population.append(
-                Agent(self.world_size, self.behaviours, self.mutation_rate))
+                Agent(self.world_size, self.behaviours,
+                      (self.mutation_rate, self.meta_mutation, self.meta_mutation_range)))
 
     def generate_resources(self, loc: Location):
         """
@@ -123,14 +128,18 @@ class World():
 
 class Agent():
 
-    def __init__(self, world_size, behaviours, mutation_rate):
+    def __init__(self, world_size, behaviours, mutation_parameters):
         # current location: x
         self.position = (random.choice(range(0, world_size)),
                          random.choice(range(0, world_size)))
         self.sensory_state = 0          # current sensory state: s
         self.resources = 0.             # current reservoir of resources: E
         self.current_beaviour = (0, 0)  # update loc: loc' = loc + behav
-        self.mutation = mutation_rate   # mutation rate of sensor_map's loci: μ
+        # mutation rate of sensor_map's loci: μ
+        self.mutation_rate = mutation_parameters[0]
+        self.meta_mutation = mutation_parameters[1]
+        self.meta_mutation_range = mutation_parameters[2]
+
         self.sensory_motor_map = []     # sensory motor map: φ
         self.behaviours = behaviours
 
@@ -140,14 +149,34 @@ class Agent():
     def sum(self, tuple_1, tuple_2):
         return tuple(map(operator.add, tuple_1, tuple_2))
 
-    def mutation():
-        return "TODO"
+    def mutate(self):
+        self.resources /= 2
+        # the child is going to have half of the resources of the parent
+        child = copy.deepcopy(self)
+
+        # mutate the sensory_motor_map
+        new_sensory_motor_map = []
+        for behaviour in self.sensory_motor_map:
+            if random.random() < self.mutation_rate:
+                self.sensory_motor_map.append(random.choice(self.behaviours))
+            else:
+                new_sensory_motor_map.append(behaviour)
+        child.sensory_motor_map = new_sensory_motor_map
+
+        # mutate the mutation rate
+        if(rando.random() < self.meta_mutation):
+            child.mutation_rate = random.uniform(
+                max(0, self.meta_mutation - self.meta_mutation_range),
+                min(1, self.meta_mutation + self.meta_mutation_range))
+
+        return child
 
 
 def main():
     print("Start")
     world_size = 21
-    world = World(world_size, 1, 0.005)
+    world = World(world_size, 1, mutation_rate=0.005,
+                  meta_mutation=0.01, meta_mutation_range=0.0025)
     print("Initial world")
     world.print_world()
     world.generate_resources((11, 11))
@@ -162,6 +191,7 @@ def main():
     print(len(world.behaviours))
     print("Check sensory morot map")
     print(len(world.population[0].sensory_motor_map))
+    print(world.population[0].mutate())
     print("End")
 
 
