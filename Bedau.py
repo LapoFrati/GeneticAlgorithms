@@ -140,6 +140,8 @@ class Agent():
     def sum(self, tuple_1, tuple_2):
         return tuple(map(operator.add, tuple_1, tuple_2))
 
+    def mutation():
+        return "TODO"
 
 def main():
     print("Start")
