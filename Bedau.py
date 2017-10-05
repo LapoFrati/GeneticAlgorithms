@@ -118,7 +118,7 @@ class World():
 
     def print_world(self):
         for row in self.world:
-            print(''.join(map(lambda x: str(int(x)) + ' ', row)))
+            print(''.join(map(lambda x: str(int(x)).ljust(4), row)))
 
 
 class Agent():
@@ -143,18 +143,24 @@ class Agent():
     def mutation():
         return "TODO"
 
+
 def main():
     print("Start")
     world_size = 21
     world = World(world_size, 1, 0.005)
+    print("Initial world")
     world.print_world()
     world.generate_resources((11, 11))
+    print("Created resource pyramid")
     world.print_world()
+    print("Check sensory states")
     print(world.get_sensory_state((12, 12)))
     print(world.get_sensory_state((11, 11)))
     print(world.get_sensory_state((10, 10)))
+    print("Check behaviours")
     print(world.behaviours)
     print(len(world.behaviours))
+    print("Check sensory morot map")
     print(len(world.population[0].sensory_motor_map))
     print("End")
 
