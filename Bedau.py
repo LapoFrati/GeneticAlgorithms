@@ -158,13 +158,15 @@ class Agent():
         new_sensory_motor_map = []
         for behaviour in self.sensory_motor_map:
             if random.random() < self.mutation_rate:
-                self.sensory_motor_map.append(random.choice(self.behaviours))
+                list_of_behaviours = list(self.behaviours)
+                list_of_behaviours.remove(behaviour)
+                new_sensory_motor_map.append(random.choice(list_of_behaviours))
             else:
                 new_sensory_motor_map.append(behaviour)
         child.sensory_motor_map = new_sensory_motor_map
 
         # mutate the mutation rate
-        if(rando.random() < self.meta_mutation):
+        if(random.random() < self.meta_mutation):
             child.mutation_rate = random.uniform(
                 max(0, self.meta_mutation - self.meta_mutation_range),
                 min(1, self.meta_mutation + self.meta_mutation_range))
