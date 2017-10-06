@@ -21,22 +21,24 @@ class World():
         # mutation rate varies in [μ-ε,μ+ε]: ε
         self.meta_mutation_range = meta_mutation_range
         # possible behaviours are 1-15 steps in 8 compass direction + (0,0)
-        self.behaviours = [(0, 0)]
+        self.behaviours = [(0, 0, 0)]
+        coeff = math.sqrt(2)
         for inc in range(1, 16):
-            self.behaviours.append((inc, 0))
-            self.behaviours.append((-inc, 0))
-            self.behaviours.append((0, inc))
-            self.behaviours.append((0, -inc))
-            self.behaviours.append((inc, inc))
-            self.behaviours.append((-inc, -inc))
-            self.behaviours.append((inc, -inc))
-            self.behaviours.append((-inc, inc))
+            self.behaviours.append((inc, 0, inc))
+            self.behaviours.append((-inc, 0, inc))
+            self.behaviours.append((0, inc, inc))
+            self.behaviours.append((0, -inc, inc))
+            magnitude = coeff*inc
+            self.behaviours.append((inc, inc, magnitude))
+            self.behaviours.append((-inc, -inc, magnitude))
+            self.behaviours.append((inc, -inc, magnitude))
+            self.behaviours.append((-inc, inc, magnitude))
 
         self.population = []
         for i in range(0, pop_size):
             self.population.append(
                 Agent(self.world_size, self.behaviours,
-                      (self.mutation_rate, self.meta_mutation, self.meta_mutation_range)))
+                      (self.mutation_rate, self.meta_mutation, self.meta_mutation_range), self.probe))
 
     def generate_resources(self, loc: Location):
         """
@@ -121,6 +123,12 @@ class World():
         """
         self.world[loc[0] % self.world_size][loc[1] % self.world_size] += value
 
+    def probe(self,loc):
+        resource_available = self.get(loc)
+        resource_to_collect = min(resource_available,100)
+        self.set(loc, - resource_to_collect)
+        return resource_to_collect
+
     def print_world(self):
         for row in self.world:
             print(''.join(map(lambda x: str(int(x)).ljust(4), row)))
@@ -128,13 +136,12 @@ class World():
 
 class Agent():
 
-    def __init__(self, world_size, behaviours, mutation_parameters):
+    def __init__(self, world_size, behaviours, mutation_parameters, probe):
         # current location: x
-        self.position = (random.choice(range(0, world_size)),
-                         random.choice(range(0, world_size)))
+        self.position = (11,11)
         self.sensory_state = 0          # current sensory state: s
         self.resources = 0.             # current reservoir of resources: E
-        self.current_beaviour = (0, 0)  # update loc: loc' = loc + behav
+        self.current_behaviour = (0, 0, 0)  # update loc: loc' = loc + behav
         # mutation rate of sensor_map's loci: μ
         self.mutation_rate = mutation_parameters[0]
         self.meta_mutation = mutation_parameters[1]
@@ -142,9 +149,11 @@ class Agent():
 
         self.sensory_motor_map = []     # sensory motor map: φ
         self.behaviours = behaviours
+        self.probe = probe
 
         for i in range(0, 1024):
             self.sensory_motor_map.append(random.choice(behaviours))
+
 
     def sum(self, tuple_1, tuple_2):
         return tuple(map(operator.add, tuple_1, tuple_2))
@@ -173,6 +182,9 @@ class Agent():
 
         return child
 
+    def update_resources(self):
+        self.resources += self.probe(self.position) - 20 - self.current_behaviour[2]
+
 
 def main():
     print("Start")
@@ -191,6 +203,10 @@ def main():
     print("Check behaviours")
     print(world.behaviours)
     print(len(world.behaviours))
+    print(world.population[0].resources)
+    world.population[0].update_resources()
+    print(world.population[0].resources)
+    world.print_world()
     print("Check sensory morot map")
     print(len(world.population[0].sensory_motor_map))
     print(world.population[0].mutate())
