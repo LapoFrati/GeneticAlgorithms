@@ -38,6 +38,15 @@ class Evolution():
                 Agent(self.world_size, self.behaviours,
                       (self.mutation_rate, self.meta_mutation, self.meta_mutation_range), self.world))
 
+        def generate_new_pop():
+            new_population = []
+            for agent in population:
+                state, child = agent.update()
+                if(state == True):
+                    new_pop.append(agent)
+                if(child == True):
+                    new_pop.append(child)
+            self.population = new_population
 
 class World():
     def __init__(self, world_size):
@@ -192,6 +201,19 @@ class Agent():
         self.resources += self.world.probe(self.position) - \
             20 - self.current_behaviour[2]
 
+    def update_agent(self):
+        self.sensory_state = self.world.get_sensory_state(self.position)
+        self.current_behaviour = self.sensory_motor_map[self.sensory_state]
+        self.position = self.sum(self.position, self.current_behaviour)
+        self.update_resources()
+        if self.resources >= 500:
+            mutate(self)
+            return True, True
+        if self.resources <= 0:
+            return False, None
+        else:
+            return True, None
+
 
 def main():
     print("Start")
@@ -212,6 +234,7 @@ def main():
     agent = evol.population[0]
     agent.position = (11, 12)
     agent.update_resources()
+    agent.update_agent()
     world.print_world()
     print("End")
 
