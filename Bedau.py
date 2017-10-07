@@ -3,6 +3,7 @@ import numpy as np
 import math
 import typing as tp
 import copy
+import operator
 Location = tp.Tuple[int, int]
 
 behaviours = []
@@ -38,22 +39,35 @@ class Evolution():
                 Agent(self.world_size, self.behaviours,
                       (self.mutation_rate, self.meta_mutation, self.meta_mutation_range), self.world))
 
-        def generate_new_pop():
-            new_population = []
-            for agent in population:
-                state, child = agent.update()
-                if(state == True):
-                    new_pop.append(agent)
-                if(child == True):
-                    new_pop.append(child)
-            self.population = new_population
+    def iterate(self, iterations):
+        for n in range(0, iterations):
+            self.world.generate_resources(self.world.random_location())
+            self.update_pop()
+            self.print_pop()
+
+    def update_pop(self):
+        new_pop = []
+        for agent in self.population:
+            state, child = agent.update()
+            if(state == True):
+                new_pop.append(agent)
+            if(child is not None):
+                new_pop.append(child)
+        self.population = new_pop
+
+    def print_pop(self):
+        # for idx, agent in enumerate(self.population):
+        #    print("agent {}: {}".format(idx, agent.resources))
+        print("Pop size: {}".format(len(self.population)))
+        print("Residual resource: {}".format(self.world.residual_resource()))
+
 
 class World():
     def __init__(self, world_size):
         self.world_size = world_size
         self.world = np.zeros((world_size, world_size), dtype=int)
         self.peak_resource = 255
-        self.bin_size = self.peak_resource // 4
+        self.bin_size = self.peak_resource / 4
 
     def generate_resources(self, loc: Location):
         """
@@ -117,7 +131,6 @@ class World():
         partial_state.append(self.sense((loc[0] - 1, loc[1])) << 4)
         partial_state.append(self.sense((loc[0], loc[1] - 1)) << 6)
         partial_state.append(self.sense((loc[0], loc[1] + 1)) << 8)
-        print(partial_state)
         return sum(partial_state)
 
     def get(self, loc: Location):
@@ -149,14 +162,20 @@ class World():
         for row in self.world:
             print(''.join(map(lambda x: str(int(x)).ljust(4), row)))
 
+    def random_location(self):
+        return (random.choice(range(0, self.world_size)), random.choice(range(0, self.world_size)))
+
+    def residual_resource(self):
+        return self.world.sum()
+
 
 class Agent():
 
     def __init__(self, world_size, behaviours, mutation_parameters, world):
         # current location: x
-        self.position = (0, 0)
-        self.sensory_state = 0          # current sensory state: s
-        self.resources = 0.             # current reservoir of resources: E
+        self.position = world.random_location()
+        self.sensory_state = 0              # current sensory state: s
+        self.resources = 0.                 # current reservoir of resources: E
         self.current_behaviour = (0, 0, 0)  # update loc: loc' = loc + behav
         # mutation rate of sensor_map's loci: μ
         self.mutation_rate = mutation_parameters[0]
@@ -170,8 +189,9 @@ class Agent():
         for i in range(0, 1024):
             self.sensory_motor_map.append(random.choice(behaviours))
 
-    def sum(self, tuple_1, tuple_2):
-        return tuple(map(operator.add, tuple_1, tuple_2))
+    def move(self, tuple_1, tuple_2):
+        self.position = tuple(map(lambda x, y: (x + y) %
+                                  self.world.world_size, tuple_1, tuple_2[:2]))
 
     def mutate(self):
         self.resources /= 2
@@ -201,41 +221,29 @@ class Agent():
         self.resources += self.world.probe(self.position) - \
             20 - self.current_behaviour[2]
 
-    def update_agent(self):
+    def update(self):
         self.sensory_state = self.world.get_sensory_state(self.position)
         self.current_behaviour = self.sensory_motor_map[self.sensory_state]
-        self.position = self.sum(self.position, self.current_behaviour)
+        self.move(self.position, self.current_behaviour)
         self.update_resources()
-        if self.resources >= 500:
-            mutate(self)
-            return True, True
         if self.resources <= 0:
             return False, None
+        if self.resources >= 500:
+            return True, self.mutate()
         else:
             return True, None
 
 
 def main():
     print("Start")
-    world_size = 21
-    evol = Evolution(world_size=world_size, pop_size=1, mutation_rate=0.005,
-                     meta_mutation=0.01, meta_mutation_range=0.0025)
-    world = evol.world
-    print("Initial world")
-    world.print_world()
-    world.generate_resources((11, 11))
-    print("Created resource pyramid")
-    world.print_world()
-    print("Check sensory states")
-    print("(12,12): " + str(world.get_sensory_state((12, 12))))
-    print("(11,11): " + str(world.get_sensory_state((11, 11))))
-    print("(10,10): " + str(world.get_sensory_state((10, 10))))
-
-    agent = evol.population[0]
-    agent.position = (11, 12)
-    agent.update_resources()
-    agent.update_agent()
-    world.print_world()
+    world_size = 128
+    pop_size = 100
+    mutation_rate = 0.01
+    meta_mutation = 0.01
+    meta_mutation_range = 0.0025  # from paper
+    evol = Evolution(world_size=world_size, pop_size=pop_size, mutation_rate=mutation_rate,
+                     meta_mutation=meta_mutation, meta_mutation_range=meta_mutation_range)
+    evol.iterate(100)
     print("End")
 
 
