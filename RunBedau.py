@@ -1,6 +1,4 @@
-from Evolution import Evolution
-
-behaviours = []
+from Bedau.Evolution import Evolution
 
 
 def main():

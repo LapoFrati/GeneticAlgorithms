@@ -1,5 +1,5 @@
-from World import World
-from Agent import Agent
+from Bedau.World import World
+from Bedau.Agent import Agent
 import math
 
 
