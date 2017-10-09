@@ -1,5 +1,6 @@
 from Bedau.World import World
 from Bedau.Agent import Agent
+from random import shuffle
 import math
 
 
@@ -41,6 +42,7 @@ class Evolution():
 
     def update_pop(self):
         new_pop = []
+        shuffle(self.population)
         for agent in self.population:
             state, child = agent.update()
             if(state == True):
