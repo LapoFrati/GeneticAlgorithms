@@ -81,18 +81,21 @@ class World():
         Args:
             loc: a tuple (x,y) that can be outside the limits of the world_size
         Returns:
-            the corresponding location on the torus
+            the resource at the corresponding location on the torus
         """
         return self.world[loc[0] % self.world_size][loc[1] % self.world_size]
 
-    def set(self, loc: Location, value: float):
+    def set(self, loc: Location, increment: float):
         """
         Sets the resource at the specified position to value
         Args:
             loc: a tuple (x,y) that can be outside the limits of the world_size
-            value: amount to add in the specified position
+            increment: amount to add in the specified position
         """
-        self.world[loc[0] % self.world_size][loc[1] % self.world_size] += value
+        curr_value = self.get(loc)
+        new_value = min(curr_value + increment, 255)
+        self.world[loc[0] % self.world_size][loc[1] %
+                                             self.world_size] = new_value
 
     def probe(self, loc):
         resource_available = self.get(loc)
