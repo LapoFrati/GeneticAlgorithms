@@ -8,7 +8,7 @@ class Agent():
         # current location: x
         self.position = world.random_location()
         self.sensory_state = 0              # current sensory state: s
-        self.resources = 0.                 # current reservoir of resources: E
+        self.resources = 250.               # current reservoir of resources: E
         self.current_behaviour = (0, 0, 0)  # update loc: loc' = loc + behav
         # mutation rate of sensor_map's loci: μ
         self.mutation_rate = mutation_parameters[0]
