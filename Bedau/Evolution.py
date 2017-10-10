@@ -1,6 +1,7 @@
 from Bedau.World import World
 from Bedau.Agent import Agent
 from random import shuffle
+import numpy as np
 import math
 
 
@@ -33,12 +34,22 @@ class Evolution():
             self.population.append(
                 Agent(self.world_size, self.behaviours,
                       (self.mutation_rate, self.meta_mutation, self.meta_mutation_range), self.world))
+        self.history = []
 
     def iterate(self, iterations):
+        self.history = []
         for n in range(0, iterations):
             self.world.generate_resources(self.world.random_location())
             self.update_pop()
+            self.log_history()
             self.print_pop()
+
+    def log_history(self):
+        temp = []
+        for agent in self.population:
+            temp.append((agent.position[1], agent.position[0]))
+        locations = np.array(temp)
+        self.history.append((np.array(self.world.world), locations))
 
     def update_pop(self):
         new_pop = []
@@ -56,3 +67,8 @@ class Evolution():
         #    print("agent {}: {}".format(idx, agent.resources))
         print("Pop size: {}".format(len(self.population)))
         print("Residual resource: {}".format(self.world.residual_resource()))
+        agents_resources = 0
+        for agent in self.population:
+            agents_resources += agent.resources
+        print("Resources collected: {}".format(agents_resources))
+        # self.world.print_world()
