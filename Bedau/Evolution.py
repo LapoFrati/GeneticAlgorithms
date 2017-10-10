@@ -1,6 +1,10 @@
 from Bedau.World import World
 from Bedau.Agent import Agent
 from random import shuffle
+from matplotlib import pyplot as plt
+from matplotlib import cm
+from matplotlib import animation
+from datetime import datetime as dt
 import numpy as np
 import math
 
@@ -43,6 +47,7 @@ class Evolution():
             self.update_pop()
             self.log_history()
             self.print_pop()
+        self.plot_history()
 
     def log_history(self):
         temp = []
@@ -72,3 +77,28 @@ class Evolution():
             agents_resources += agent.resources
         print("Resources collected: {}".format(agents_resources))
         # self.world.print_world()
+
+    def plot_history(self):
+        fig, ax = plt.subplots()
+        ax = plt.axes(xlim=(0, 128), ylim=(0, 128))
+        line1 = ax.imshow(self.history[0][0], shape=(128, 128),
+                          interpolation='nearest', cmap=cm.coolwarm)
+        line2 = ax.scatter([], [], s=10, c='red')
+
+        def init():
+            line1.set_array([[], []])
+            line2.set_offsets([])
+            return line1, line2
+
+        def animate(i):
+            line1.set_array(self.history[i][0])
+            line2.set_offsets(self.history[i][1])
+            return line1, line2
+
+        anim = animation.FuncAnimation(fig, animate, frames=len(
+            self.history), interval=300, blit=True, init_func=init, repeat=False)
+        path_to_save = dt.now().strftime('%Y-%m-%d_%H-%M') + '.mp4'
+        print('Plotting history to ' + path_to_save)
+        anim.save(path_to_save, fps=5, dpi=300,
+                  extra_args=['-vcodec', 'libx264'])
+        print('Plotting Finished')
