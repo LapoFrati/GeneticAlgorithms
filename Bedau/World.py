@@ -85,7 +85,7 @@ class World():
         """
         return self.world[loc[0] % self.world_size][loc[1] % self.world_size]
 
-    def set(self, loc: Location, increment: float):
+    def set(self, loc: Location, new_value: float):
         """
         Sets the resource at the specified position to value
         Args:
@@ -93,7 +93,7 @@ class World():
             increment: amount to add in the specified position
         """
         curr_value = self.get(loc)
-        new_value = min(curr_value + increment, 255)
+        new_value = max(curr_value, new_value)
         self.world[loc[0] % self.world_size][loc[1] %
                                              self.world_size] = new_value
 
