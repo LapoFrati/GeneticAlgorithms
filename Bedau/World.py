@@ -7,7 +7,7 @@ Location = tp.Tuple[int, int]
 class World():
     def __init__(self, world_size):
         self.world_size = world_size
-        self.world = np.zeros((world_size, world_size), dtype=int)
+        self.world = np.zeros((world_size, world_size), dtype=float)
         self.peak_resource = 255
         self.bin_size = self.peak_resource / 4
 
