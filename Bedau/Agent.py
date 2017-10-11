@@ -30,7 +30,7 @@ class Agent():
         self.resources /= 2
         # the child is going to have half of the resources of the parent
         child = copy.deepcopy(self)
-
+        mutations = 0
         # mutate the sensory_motor_map
         new_sensory_motor_map = []
         for behaviour in self.sensory_motor_map:
@@ -38,6 +38,7 @@ class Agent():
                 list_of_behaviours = list(self.behaviours)
                 list_of_behaviours.remove(behaviour)
                 new_sensory_motor_map.append(random.choice(list_of_behaviours))
+                mutations += 1
             else:
                 new_sensory_motor_map.append(behaviour)
         child.sensory_motor_map = new_sensory_motor_map
@@ -48,7 +49,7 @@ class Agent():
                 max(0, self.meta_mutation - self.meta_mutation_range),
                 min(1, self.meta_mutation + self.meta_mutation_range))
 
-        return child
+        return child, mutations
 
     def update_resources(self):
         self.resources += self.world.probe(self.position) - \
@@ -60,8 +61,9 @@ class Agent():
         self.move(self.position, self.current_behaviour)
         self.update_resources()
         if self.resources <= 0:
-            return False, None
+            return False, None, None
         if self.resources >= 500:
-            return True, self.mutate()
+            child, mutations = self.mutate()
+            return True, child, mutations
         else:
-            return True, None
+            return True, None, None

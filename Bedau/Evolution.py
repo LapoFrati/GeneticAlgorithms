@@ -39,15 +39,18 @@ class Evolution():
                 Agent(self.world_size, self.behaviours,
                       (self.mutation_rate, self.meta_mutation, self.meta_mutation_range), self.world))
         self.history = []
+        self.mutations_counter = 0
 
-    def iterate(self, iterations):
+    def iterate(self, mutations, plotting=False):
         self.history = []
-        for n in range(0, iterations):
+        self.mutations_counter = 0
+        while(self.mutations_counter <= mutations):
             self.world.generate_resources(self.world.random_location())
-            self.update_pop()
+            self.mutations_counter += self.update_pop()
             self.log_history()
             self.print_pop()
-        self.plot_history()
+        if plotting:
+            self.plot_history()
 
     def log_history(self):
         temp = []
@@ -58,32 +61,38 @@ class Evolution():
 
     def update_pop(self):
         new_pop = []
+        mutations_counter = 0
         shuffle(self.population)
         for agent in self.population:
-            state, child = agent.update()
+            state, child, mutations = agent.update()
             if(state == True):
                 new_pop.append(agent)
             if(child is not None):
                 new_pop.append(child)
+                mutations_counter += mutations
         self.population = new_pop
+        return mutations_counter
 
     def print_pop(self):
         # for idx, agent in enumerate(self.population):
         #    print("agent {}: {}".format(idx, agent.resources))
+        print("---------------------")
+        print("Iteration: {}".format(len(self.history))
+        print("Mutations: {}".format(self.mutations_counter))
         print("Pop size: {}".format(len(self.population)))
         print("Residual resource: {}".format(self.world.residual_resource()))
-        agents_resources = 0
+        agents_resources=0
         for agent in self.population:
             agents_resources += agent.resources
         print("Resources collected: {}".format(agents_resources))
         # self.world.print_world()
 
     def plot_history(self):
-        fig, ax = plt.subplots()
-        ax = plt.axes(xlim=(0, 128), ylim=(0, 128))
-        line1 = ax.imshow(self.history[0][0], shape=(128, 128),
+        fig, ax=plt.subplots()
+        ax=plt.axes(xlim=(0, 128), ylim=(0, 128))
+        line1=ax.imshow(self.history[0][0], shape=(128, 128),
                           interpolation='nearest', cmap=cm.coolwarm)
-        line2 = ax.scatter([], [], s=10, c='red')
+        line2=ax.scatter([], [], s=10, c='red')
 
         def init():
             line1.set_array([[], []])
@@ -95,9 +104,9 @@ class Evolution():
             line2.set_offsets(self.history[i][1])
             return line1, line2
 
-        anim = animation.FuncAnimation(fig, animate, frames=len(
+        anim=animation.FuncAnimation(fig, animate, frames=len(
             self.history), interval=300, blit=True, init_func=init, repeat=False)
-        path_to_save = dt.now().strftime('%Y-%m-%d_%H-%M') + '.mp4'
+        path_to_save=dt.now().strftime('%Y-%m-%d_%H-%M') + '.mp4'
         print('Plotting history to ' + path_to_save)
         anim.save(path_to_save, fps=5, dpi=300,
                   extra_args=['-vcodec', 'libx264'])
