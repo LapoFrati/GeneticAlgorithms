@@ -49,6 +49,8 @@ class Evolution():
             self.mutations_counter += self.update_pop()
             self.log_history()
             self.print_pop()
+            if len(self.population) == 0:
+                break
         if plotting:
             self.plot_history()
 
@@ -77,22 +79,22 @@ class Evolution():
         # for idx, agent in enumerate(self.population):
         #    print("agent {}: {}".format(idx, agent.resources))
         print("---------------------")
-        print("Iteration: {}".format(len(self.history))
+        print("Iteration: {}".format(len(self.history)))
         print("Mutations: {}".format(self.mutations_counter))
         print("Pop size: {}".format(len(self.population)))
         print("Residual resource: {}".format(self.world.residual_resource()))
-        agents_resources=0
+        agents_resources = 0
         for agent in self.population:
             agents_resources += agent.resources
         print("Resources collected: {}".format(agents_resources))
         # self.world.print_world()
 
     def plot_history(self):
-        fig, ax=plt.subplots()
-        ax=plt.axes(xlim=(0, 128), ylim=(0, 128))
-        line1=ax.imshow(self.history[0][0], shape=(128, 128),
+        fig, ax = plt.subplots()
+        ax = plt.axes(xlim=(0, 128), ylim=(0, 128))
+        line1 = ax.imshow(self.history[0][0], shape=(128, 128),
                           interpolation='nearest', cmap=cm.coolwarm)
-        line2=ax.scatter([], [], s=10, c='red')
+        line2 = ax.scatter([], [], s=10, c='red')
 
         def init():
             line1.set_array([[], []])
@@ -104,9 +106,9 @@ class Evolution():
             line2.set_offsets(self.history[i][1])
             return line1, line2
 
-        anim=animation.FuncAnimation(fig, animate, frames=len(
+        anim = animation.FuncAnimation(fig, animate, frames=len(
             self.history), interval=300, blit=True, init_func=init, repeat=False)
-        path_to_save=dt.now().strftime('%Y-%m-%d_%H-%M') + '.mp4'
+        path_to_save = dt.now().strftime('%Y-%m-%d_%H-%M') + '.mp4'
         print('Plotting history to ' + path_to_save)
         anim.save(path_to_save, fps=5, dpi=300,
                   extra_args=['-vcodec', 'libx264'])
