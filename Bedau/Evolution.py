@@ -6,6 +6,7 @@ from matplotlib import animation
 from datetime import datetime as dt
 import numpy as np
 import math
+import random
 
 
 class Evolution():
@@ -33,7 +34,7 @@ class Evolution():
             self.behaviours.append((-inc, inc, magnitude))
 
         self.time = dt.now()
-        self.seed = self.time.microsecond
+        self.seed = random.SystemRandom().getrandbits(32)
         self.random_source = np.random.RandomState(self.seed)
         self.world = World(world_size, self.random_source)
         self.population = []
