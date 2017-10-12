@@ -10,7 +10,7 @@ import random
 
 
 class Evolution():
-    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq):
+    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq, seed=None):
         self.world_size = world_size
         # mutation rate: μ
         self.mutation_rate = mutation_rate
@@ -34,7 +34,10 @@ class Evolution():
             self.behaviours.append((-inc, inc, magnitude))
 
         self.time = dt.now()
-        self.seed = random.SystemRandom().getrandbits(32)
+        if seed is not None:
+            self.seed = seed
+        else:
+            self.seed = random.SystemRandom().getrandbits(32)
         self.random_source = np.random.RandomState(self.seed)
         self.world = World(world_size, self.random_source)
         self.population = []
