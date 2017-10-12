@@ -1,10 +1,9 @@
-import random
 import copy
 
 
 class Agent():
 
-    def __init__(self, world_size, behaviours, mutation_parameters, world):
+    def __init__(self, world_size, behaviours, mutation_parameters, world, random_source):
         # current location: x
         self.position = world.random_location()
         self.sensory_state = 0              # current sensory state: s
@@ -18,9 +17,11 @@ class Agent():
         self.sensory_motor_map = []     # sensory motor map: φ
         self.behaviours = behaviours
         self.world = world
+        self.random_source = random_source
 
         for i in range(0, 1024):
-            self.sensory_motor_map.append(random.choice(behaviours))
+            pick = self.random_source.randint(len(behaviours))
+            self.sensory_motor_map.append(behaviours[pick])
 
     def move(self, tuple_1, tuple_2):
         self.position = tuple(map(lambda x, y: (x + y) %
@@ -34,18 +35,20 @@ class Agent():
         # mutate the sensory_motor_map
         new_sensory_motor_map = []
         for behaviour in self.sensory_motor_map:
-            if random.random() < self.mutation_rate:
-                list_of_behaviours = list(self.behaviours)
-                list_of_behaviours.remove(behaviour)
-                new_sensory_motor_map.append(random.choice(list_of_behaviours))
+            if self.random_source.rand(1) < self.mutation_rate:
+                new_behaviour = behaviour
+                while(new_behaviour is behaviour):
+                    pick = self.random_source.randint(len(self.behaviours))
+                    new_behaviour = self.behaviours[pick]
+                new_sensory_motor_map.append(new_behaviour)
                 mutations += 1
             else:
                 new_sensory_motor_map.append(behaviour)
         child.sensory_motor_map = new_sensory_motor_map
 
         # mutate the mutation rate
-        if(random.random() < self.meta_mutation):
-            child.mutation_rate = random.uniform(
+        if(self.random_source.rand(1) < self.meta_mutation):
+            child.mutation_rate = self.random_source.uniform(
                 max(0, self.meta_mutation - self.meta_mutation_range),
                 min(1, self.meta_mutation + self.meta_mutation_range))
 

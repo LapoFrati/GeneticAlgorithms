@@ -1,11 +1,10 @@
 import typing as tp
 import numpy as np
-import random
 Location = tp.Tuple[int, int]
 
 
 class World():
-    def __init__(self, world_size):
+    def __init__(self, world_size, random_source):
         self.world_size = world_size
         self.world = np.zeros((world_size, world_size), dtype=float)
         self.peak_resource = 255
@@ -18,6 +17,8 @@ class World():
             (self.world_size // 3, 2 * self.world_size // 3))
         self.generate_resources(
             (2 * self.world_size // 3, 2 * self.world_size // 3))
+
+        self.random_source = random_source
 
     def generate_resources(self, loc: Location):
         """
@@ -126,7 +127,8 @@ class World():
             print(''.join(map(lambda x: str(int(x)).ljust(4), row)))
 
     def random_location(self):
-        return (random.choice(range(0, self.world_size)), random.choice(range(0, self.world_size)))
+        return (self.random_source.choice(self.world_size),
+                self.random_source.choice(self.world_size))
 
     def residual_resource(self):
         return self.world.sum()

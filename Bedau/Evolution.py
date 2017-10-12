@@ -1,6 +1,5 @@
 from Bedau.World import World
 from Bedau.Agent import Agent
-from random import shuffle
 from matplotlib import pyplot as plt
 from matplotlib import cm
 from matplotlib import animation
@@ -21,7 +20,6 @@ class Evolution():
         # possible behaviours are 1-15 steps in 8 compass direction + (0,0)
         self.behaviours = [(0, 0, 0)]
         self.resource_freq = resource_freq
-        self.world = World(world_size)
         coeff = math.sqrt(2)
         for inc in range(1, 16):
             self.behaviours.append((inc, 0, inc))
@@ -34,11 +32,18 @@ class Evolution():
             self.behaviours.append((inc, -inc, magnitude))
             self.behaviours.append((-inc, inc, magnitude))
 
+        self.time = dt.now()
+        self.seed = self.time.microsecond
+        self.random_source = np.random.RandomState(self.seed)
+        self.world = World(world_size, self.random_source)
         self.population = []
         for i in range(0, pop_size):
             self.population.append(
-                Agent(self.world_size, self.behaviours,
-                      (self.mutation_rate, self.meta_mutation, self.meta_mutation_range), self.world))
+                Agent(self.world_size,
+                      self.behaviours,
+                      (self.mutation_rate, self.meta_mutation,
+                       self.meta_mutation_range),
+                      self.world, self.random_source))
         self.history = []
         self.mutations_counter = 0
 
@@ -57,6 +62,7 @@ class Evolution():
                 break
         if plotting:
             self.plot_history()
+        print("\nSeed: {}\n".format(self.seed))
 
     def log_history(self):
         temp = []
@@ -68,7 +74,7 @@ class Evolution():
     def update_pop(self):
         new_pop = []
         mutations_counter = 0
-        shuffle(self.population)
+        self.random_source.shuffle(self.population)
         for agent in self.population:
             state, child, mutations = agent.update()
             if(state == True):
@@ -112,7 +118,7 @@ class Evolution():
 
         anim = animation.FuncAnimation(fig, animate, frames=len(
             self.history), interval=300, blit=True, init_func=init, repeat=False)
-        path_to_save = dt.now().strftime('%Y-%m-%d_%H-%M') + '.mp4'
+        path_to_save = self.time.strftime('%Y-%m-%d_%H-%M') + '.mp4'
         print('Plotting history to ' + path_to_save)
         anim.save(path_to_save, fps=5, dpi=300,
                   extra_args=['-vcodec', 'libx264'])
