@@ -10,7 +10,7 @@ import math
 
 
 class Evolution():
-    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range):
+    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq):
         self.world_size = world_size
         # mutation rate: μ
         self.mutation_rate = mutation_rate
@@ -20,6 +20,7 @@ class Evolution():
         self.meta_mutation_range = meta_mutation_range
         # possible behaviours are 1-15 steps in 8 compass direction + (0,0)
         self.behaviours = [(0, 0, 0)]
+        self.resource_freq = resource_freq
         self.world = World(world_size)
         coeff = math.sqrt(2)
         for inc in range(1, 16):
@@ -44,8 +45,11 @@ class Evolution():
     def iterate(self, mutations, plotting=False):
         self.history = []
         self.mutations_counter = 0
+        resources_timer = 0
         while(self.mutations_counter <= mutations):
-            self.world.generate_resources(self.world.random_location())
+            if resources_timer == 0:
+                self.world.generate_resources(self.world.random_location())
+            resources_timer = (resources_timer + 1) % self.resource_freq
             self.mutations_counter += self.update_pop()
             self.log_history()
             self.print_pop()
