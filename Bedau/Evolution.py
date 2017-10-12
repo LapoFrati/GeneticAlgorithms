@@ -49,17 +49,16 @@ class Evolution():
                        self.meta_mutation_range),
                       self.world, self.random_source))
         self.history = []
-        self.mutations_counter = 0
 
-    def iterate(self, mutations, plotting=False):
+    def iterate(self, iterations, plotting=False):
         self.history = []
         self.mutations_counter = 0
         resources_timer = 0
-        while(self.mutations_counter <= mutations):
+        for idx in enumerate(range(iterations)):
             if resources_timer == 0:
                 self.world.generate_resources(self.world.random_location())
             resources_timer = (resources_timer + 1) % self.resource_freq
-            self.mutations_counter += self.update_pop()
+            self.update_pop()
             self.log_history()
             self.print_pop()
             if len(self.population) == 0:
@@ -77,24 +76,20 @@ class Evolution():
 
     def update_pop(self):
         new_pop = []
-        mutations_counter = 0
         self.random_source.shuffle(self.population)
         for agent in self.population:
-            state, child, mutations = agent.update()
+            state, child = agent.update()
             if(state == True):
                 new_pop.append(agent)
             if(child is not None):
                 new_pop.append(child)
-                mutations_counter += mutations
         self.population = new_pop
-        return mutations_counter
 
     def print_pop(self):
         # for idx, agent in enumerate(self.population):
         #    print("agent {}: {}".format(idx, agent.resources))
         print("---------------------")
         print("Iteration: {}".format(len(self.history)))
-        print("Mutations: {}".format(self.mutations_counter))
         print("Pop size: {}".format(len(self.population)))
         print("Residual resource: {}".format(self.world.residual_resource()))
         agents_resources = 0
