@@ -10,6 +10,14 @@ class World():
         self.world = np.zeros((world_size, world_size), dtype=float)
         self.peak_resource = 255
         self.bin_size = self.peak_resource / 4
+        # add 4 resource pyramids to initialize the world
+        self.generate_resources((self.world_size // 3, self.world_size // 3))
+        self.generate_resources(
+            (2 * self.world_size // 3, self.world_size // 3))
+        self.generate_resources(
+            (self.world_size // 3, 2 * self.world_size // 3))
+        self.generate_resources(
+            (2 * self.world_size // 3, 2 * self.world_size // 3))
 
     def generate_resources(self, loc: Location):
         """
@@ -97,10 +105,20 @@ class World():
         self.world[loc[0] % self.world_size][loc[1] %
                                              self.world_size] = new_value
 
+    def consume(self, loc: Location, extracted: float):
+        """
+        Consumes the resource at the specified position to value
+        Args:
+            loc: a tuple (x,y) that can be outside the limits of the world_size
+            extracted: amount to remove from the specified position
+        """
+        self.world[loc[0] % self.world_size][loc[1] %
+                                             self.world_size] -= extracted
+
     def probe(self, loc):
         resource_available = self.get(loc)
         resource_to_collect = min(resource_available, 100)
-        self.set(loc, - resource_to_collect)
+        self.consume(loc, resource_to_collect)
         return resource_to_collect
 
     def print_world(self):
