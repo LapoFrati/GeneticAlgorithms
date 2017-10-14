@@ -31,6 +31,7 @@ class Agent():
         self.resources /= 2
         # the child is going to have half of the resources of the parent
         child = copy.deepcopy(self)
+        child.world = self.world
         # mutate the sensory_motor_map
         new_sensory_motor_map = []
         for behaviour in self.sensory_motor_map:
