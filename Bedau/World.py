@@ -7,18 +7,13 @@ class World():
     def __init__(self, world_size, random_source):
         self.world_size = world_size
         self.world = np.zeros((world_size, world_size), dtype=float)
+        self.random_source = random_source
         self.peak_resource = 255
         self.bin_size = self.peak_resource / 4
-        # add 4 resource pyramids to initialize the world
-        self.generate_resources((self.world_size // 3, self.world_size // 3))
-        self.generate_resources(
-            (2 * self.world_size // 3, self.world_size // 3))
-        self.generate_resources(
-            (self.world_size // 3, 2 * self.world_size // 3))
-        self.generate_resources(
-            (2 * self.world_size // 3, 2 * self.world_size // 3))
-
-        self.random_source = random_source
+        # add some resource pyramids to initialize the world
+        for i in range(20):
+            self.generate_resources(self.random_location())
+        self.consumption_counter = 0.
 
     def generate_resources(self, loc: Location):
         """
@@ -26,27 +21,12 @@ class World():
         """
         for dx in range(-8, 8):
             for dy in range(-8, 8):
-                self.set((loc[0] + dx, loc[1] + dy),
-                         self.resource_quota(dx, dy))
-
-    def resource_quota(self, dx: int, dy: int):
-        """
-        Computes the amount of resources to add in the location based on the
-        manhattan distance from the peak. The value peaks at 255 when dx=0 dy=0
-        and falls linearly up to a distance of 8
-
-        Args:
-            dx: displacement on the x-axis
-            dy: displacement on the y-axis
-
-        Returns:
-            the amount of resource to add in the location,
-        """
-        distance = abs(dx) + abs(dy)
-        if distance < 8:
-            return 255 * (1 - distance / 8)
-        else:
-            return 0.
+                distance = abs(dx) + abs(dy)
+                if distance < 8:
+                    resource = 255 * (1 - distance / 8)
+                else:
+                    resource = 0.
+                self.set((loc[0] + dx, loc[1] + dy), resource)
 
     def sense(self, loc: Location):
         """
@@ -94,32 +74,20 @@ class World():
         """
         return self.world[loc[0] % self.world_size][loc[1] % self.world_size]
 
-    def set(self, loc: Location, new_value: float):
+    def set(self, loc: Location, increment: float):
         """
         Sets the resource at the specified position to value
         Args:
             loc: a tuple (x,y) that can be outside the limits of the world_size
             increment: amount to add in the specified position
         """
-        curr_value = self.get(loc)
-        new_value = max(curr_value, new_value)
         self.world[loc[0] % self.world_size][loc[1] %
-                                             self.world_size] = new_value
-
-    def consume(self, loc: Location, extracted: float):
-        """
-        Consumes the resource at the specified position to value
-        Args:
-            loc: a tuple (x,y) that can be outside the limits of the world_size
-            extracted: amount to remove from the specified position
-        """
-        self.world[loc[0] % self.world_size][loc[1] %
-                                             self.world_size] -= extracted
+                                             self.world_size] += increment
 
     def probe(self, loc):
         resource_available = self.get(loc)
         resource_to_collect = min(resource_available, 100)
-        self.consume(loc, resource_to_collect)
+        self.set(loc, -resource_to_collect)
         return resource_to_collect
 
     def print_world(self):

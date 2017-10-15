@@ -3,35 +3,48 @@ import copy
 
 class Agent():
 
-    def __init__(self, world_size, behaviours, mutation_parameters, world, random_source):
-        # current location: x
-        self.position = world.random_location()
-        self.sensory_state = 0              # current sensory state: s
-        self.resources = 250.               # current reservoir of resources: E
-        self.current_behaviour = (0, 0, 0)  # update loc: loc' = loc + behav
-        # mutation rate of sensor_map's loci: μ
-        self.mutation_rate = mutation_parameters[0]
-        self.meta_mutation = mutation_parameters[1]
-        self.meta_mutation_range = mutation_parameters[2]
+    def __init__(self, world_size=None, behaviours=None, mutation_parameters=None, world=None, random_source=None, orig=None):
+        if orig is None:
+            # current location: x
+            self.position = world.random_location()
+            self.sensory_state = 0              # current sensory state: s
+            self.resources = 250.               # current reservoir of resources: E
+            # update loc: loc' = loc + behav
+            self.current_behaviour = (0, 0, 0)
+            # mutation rate of sensor_map's loci: μ
+            self.mutation_rate = mutation_parameters[0]
+            self.meta_mutation = mutation_parameters[1]
+            self.meta_mutation_range = mutation_parameters[2]
+            self.sensory_motor_map = []     # sensory motor map: φ
+            self.behaviours = behaviours
+            self.world = world
+            self.random_source = random_source
+            for i in range(0, 1024):
+                pick = self.random_source.randint(len(behaviours))
+                self.sensory_motor_map.append(behaviours[pick])
+        else:
+            # copy constructor
+            self.position = orig.position
+            self.sensory_state = orig.sensory_state
+            self.resources = orig.resources
+            self.current_behaviour = orig.current_behaviour
+            self.mutation_rate = orig.mutation_rate
+            self.meta_mutation = orig.meta_mutation
+            self.meta_mutation_range = orig.meta_mutation_range
+            self.sensory_motor_map = list(orig.sensory_motor_map)
+            self.behaviours = orig.behaviours
+            self.world = orig.world
+            self.random_source = orig.random_source
 
-        self.sensory_motor_map = []     # sensory motor map: φ
-        self.behaviours = behaviours
-        self.world = world
-        self.random_source = random_source
-
-        for i in range(0, 1024):
-            pick = self.random_source.randint(len(behaviours))
-            self.sensory_motor_map.append(behaviours[pick])
-
-    def move(self, tuple_1, tuple_2):
+    def move(self, position, behaviour):
+        # behaviour = (dx,dy, magnitude), discard the magnitude with [:2]
         self.position = tuple(map(lambda x, y: (x + y) %
-                                  self.world.world_size, tuple_1, tuple_2[:2]))
+                                  self.world.world_size, position, behaviour[:2]))
 
-    def mutate(self):
+    def reproduce(self):
         self.resources /= 2
         # the child is going to have half of the resources of the parent
-        child = copy.deepcopy(self)
-        child.world = self.world
+        child = Agent(orig=self)
         # mutate the sensory_motor_map
         new_sensory_motor_map = []
         for behaviour in self.sensory_motor_map:
@@ -65,6 +78,6 @@ class Agent():
         if self.resources <= 0:
             return False, None
         if self.resources >= 500:
-            return True, self.mutate()
+            return True, self.reproduce()
         else:
             return True, None

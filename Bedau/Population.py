@@ -9,7 +9,7 @@ import math
 import random
 
 
-class Evolution():
+class Population():
     def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq, seed=None):
         self.world_size = world_size
         # mutation rate: μ
@@ -50,22 +50,40 @@ class Evolution():
                       self.world, self.random_source))
         self.history = []
 
-    def iterate(self, iterations, plotting=False):
-        self.history = []
-        self.mutations_counter = 0
-        resources_timer = 0
-        for idx in enumerate(range(iterations)):
-            if resources_timer == 0:
+    def evolve(self, iterations, plotting=False):
+        for idx in range(iterations):
+            # check if resources must be updated at current iteration
+            if idx % self.resource_freq == 0:
                 self.world.generate_resources(self.world.random_location())
-            resources_timer = (resources_timer + 1) % self.resource_freq
+
             self.update_pop()
-            self.log_history()
-            self.print_pop()
+            if plotting:
+                self.log_history()
+            self.print_pop(idx)
             if len(self.population) == 0:
                 break
         if plotting:
             self.plot_history()
         print("\nSeed: {}\n".format(self.seed))
+
+    def update_pop(self):
+        new_pop = []
+        # shuffle to avoid giving proiority to any specific agent during update
+        self.random_source.shuffle(self.population)
+        for agent in self.population:
+            state, child = agent.update()
+            if(state == True):
+                new_pop.append(agent)
+                if(child is not None):
+                    new_pop.append(child)
+        self.population = new_pop
+
+    def print_pop(self, iteration):
+        print("---------------------")
+        print("Iteration: {}".format(iteration))
+        print("Pop size: {}".format(len(self.population)))
+        print("Residual resource: {}".format(self.world.residual_resource()))
+        # self.world.print_world()
 
     def log_history(self):
         temp = []
@@ -73,30 +91,6 @@ class Evolution():
             temp.append((agent.position[1], agent.position[0]))
         locations = np.array(temp)
         self.history.append((np.array(self.world.world), locations))
-
-    def update_pop(self):
-        new_pop = []
-        self.random_source.shuffle(self.population)
-        for agent in self.population:
-            state, child = agent.update()
-            if(state == True):
-                new_pop.append(agent)
-            if(child is not None):
-                new_pop.append(child)
-        self.population = new_pop
-
-    def print_pop(self):
-        # for idx, agent in enumerate(self.population):
-        #    print("agent {}: {}".format(idx, agent.resources))
-        print("---------------------")
-        print("Iteration: {}".format(len(self.history)))
-        print("Pop size: {}".format(len(self.population)))
-        print("Residual resource: {}".format(self.world.residual_resource()))
-        agents_resources = 0
-        for agent in self.population:
-            agents_resources += agent.resources
-        print("Resources collected: {}".format(agents_resources))
-        # self.world.print_world()
 
     def plot_history(self):
         fig, ax = plt.subplots()
