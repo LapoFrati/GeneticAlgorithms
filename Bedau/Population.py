@@ -10,7 +10,7 @@ import random
 
 
 class Population():
-    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq, seed=None):
+    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq, iterations, seed=None):
         self.world_size = world_size
         # mutation rate: μ
         self.mutation_rate = mutation_rate
@@ -19,19 +19,19 @@ class Population():
         # mutation rate varies in [μ-ε,μ+ε]: ε
         self.meta_mutation_range = meta_mutation_range
         # possible behaviours are 1-15 steps in 8 compass direction + (0,0)
-        self.behaviours = [(0, 0, 0)]
+        self.behaviours = [(0, 0, 0, 0)]
         self.resource_freq = resource_freq
         coeff = math.sqrt(2)
         for inc in range(1, 16):
-            self.behaviours.append((inc, 0, inc))
-            self.behaviours.append((-inc, 0, inc))
-            self.behaviours.append((0, inc, inc))
-            self.behaviours.append((0, -inc, inc))
+            self.behaviours.append((inc, 0, inc, 8 * (inc - 1) + 1))
+            self.behaviours.append((-inc, 0, inc, 8 * (inc - 1) + 2))
+            self.behaviours.append((0, inc, inc, 8 * (inc - 1) + 3))
+            self.behaviours.append((0, -inc, inc, 8 * (inc - 1) + 4))
             magnitude = coeff * inc
-            self.behaviours.append((inc, inc, magnitude))
-            self.behaviours.append((-inc, -inc, magnitude))
-            self.behaviours.append((inc, -inc, magnitude))
-            self.behaviours.append((-inc, inc, magnitude))
+            self.behaviours.append((inc, inc, magnitude, 8 * (inc - 1) + 5))
+            self.behaviours.append((-inc, -inc, magnitude, 8 * (inc - 1) + 6))
+            self.behaviours.append((inc, -inc, magnitude, 8 * (inc - 1) + 7))
+            self.behaviours.append((-inc, inc, magnitude, 8 * (inc - 1) + 8))
 
         self.time = dt.now()
         if seed is not None:
@@ -41,22 +41,28 @@ class Population():
         self.random_source = np.random.RandomState(self.seed)
         self.world = World(world_size, self.random_source)
         self.population = []
+        self.iterations = iterations
+        self.log = np.zeros((1024, 121, self.iterations))
         for i in range(0, pop_size):
             self.population.append(
-                Agent(self.world_size,
-                      self.behaviours,
-                      (self.mutation_rate, self.meta_mutation,
-                       self.meta_mutation_range),
-                      self.world, self.random_source))
+                Agent(world_size=self.world_size,
+                      behaviours=self.behaviours,
+                      mutation_parameters=(
+                          self.mutation_rate, self.meta_mutation, self.meta_mutation_range),
+                      world=self.world,
+                      random_source=self.random_source,
+                      log=self.log))
         self.history = []
 
-    def evolve(self, iterations, plotting=False):
-        for idx in range(iterations):
+    def evolve(self, plotting=False):
+        for idx in range(self.iterations):
             # check if resources must be updated at current iteration
             if idx % self.resource_freq == 0:
                 self.world.generate_resources(self.world.random_location())
-
-            self.update_pop()
+            if idx > 0:
+                # copy the previous population values to be updated
+                self.log[:, :, idx] = self.log[:, :, idx - 1]
+            self.update_pop(idx)
             if plotting:
                 self.log_history()
             self.print_pop(idx)
@@ -66,12 +72,12 @@ class Population():
             self.plot_history()
         print("\nSeed: {}\n".format(self.seed))
 
-    def update_pop(self):
+    def update_pop(self, iteration):
         new_pop = []
         # shuffle to avoid giving proiority to any specific agent during update
         self.random_source.shuffle(self.population)
         for agent in self.population:
-            state, child = agent.update()
+            state, child = agent.update(iteration)
             if(state == True):
                 new_pop.append(agent)
                 if(child is not None):
@@ -83,6 +89,11 @@ class Population():
         print("Iteration: {}".format(iteration))
         print("Pop size: {}".format(len(self.population)))
         print("Residual resource: {}".format(self.world.residual_resource()))
+        # history_slice = np.zeros((121, 1024))
+        # for agent in self.population:
+        #     for idx, behaviour in enumerate(agent.sensory_motor_map):
+        #         history_slice[behaviour[3]][idx] += 1
+        # print(history_slice)
         # self.world.print_world()
 
     def log_history(self):

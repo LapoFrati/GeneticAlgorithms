@@ -14,8 +14,9 @@ def main():
                      mutation_rate=mutation_rate,
                      meta_mutation=meta_mutation,
                      meta_mutation_range=meta_mutation_range,
-                     resource_freq=resource_freq)
-    pop.evolve(1000, plotting=False)
+                     resource_freq=resource_freq,
+                     iterations=1000)
+    pop.evolve(plotting=False)
     print("End")
 
 
