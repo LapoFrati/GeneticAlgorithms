@@ -16,7 +16,7 @@ class Agent():
             self.random_source = random_source
             self.behaviours = behaviours
             self.sensory_motor_map = self.random_source.randint(
-                len(behaviours), size=1024, dtype=int)  # sensory motor map: φ
+                121, size=1024, dtype='int8')  # sensory motor map: φ
             self.log = log
             self.log.log_sensory(self.sensory_motor_map, 0, 1)
             self.world = world
@@ -28,8 +28,7 @@ class Agent():
             self.mutation_rate = orig.mutation_rate
             self.meta_mutation = orig.meta_mutation
             self.meta_mutation_range = orig.meta_mutation_range
-            self.sensory_motor_map = np.array(
-                orig.sensory_motor_map, dtype=int)
+            self.sensory_motor_map = np.array(orig.sensory_motor_map)
             self.behaviours = orig.behaviours
             self.world = orig.world
             self.random_source = orig.random_source
