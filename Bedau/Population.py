@@ -39,7 +39,7 @@ class Population():
         self.world = World(world_size, self.random_source)
         self.population = []
         self.iterations = iterations
-        self.log = Log(self.iterations, plot_world=plotting)
+        self.log = Log(self.iterations, plot_world_flag=plotting)
         for i in range(0, pop_size):
             self.population.append(
                 Agent(world_size=self.world_size,

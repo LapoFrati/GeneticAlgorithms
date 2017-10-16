@@ -6,7 +6,7 @@ def main():
     print("Start")
     world_size = 128
     pop_size = 1000
-    mutation_rate = 0.1
+    mutation_rate = 1.
     meta_mutation = 0.66
     meta_mutation_range = 0.0025  # from paper
     resource_freq = 1
@@ -22,7 +22,8 @@ def main():
                          plotting=plotting).evolve()
 
     if plotting:
-        pop_log.plot()
+        pop_log.plot_world()
+    pop_log.plot_stats()
 
     print("End")
 
