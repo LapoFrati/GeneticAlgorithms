@@ -62,8 +62,8 @@ class Agent():
         # mutate the mutation rate
         if(self.random_source.rand(1) < self.meta_mutation):
             child.mutation_rate = self.random_source.uniform(
-                max(0, self.meta_mutation - self.meta_mutation_range),
-                min(1, self.meta_mutation + self.meta_mutation_range))
+                max(0, self.mutation_rate - self.meta_mutation_range),
+                min(1, self.mutation_rate + self.meta_mutation_range))
 
         return child
 
