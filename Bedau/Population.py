@@ -23,15 +23,15 @@ class Population():
         self.resource_freq = resource_freq
         coeff = math.sqrt(2)
         for inc in range(1, 16):
-            self.behaviours.append((inc, 0, inc, 8 * (inc - 1) + 1))
-            self.behaviours.append((-inc, 0, inc, 8 * (inc - 1) + 2))
-            self.behaviours.append((0, inc, inc, 8 * (inc - 1) + 3))
-            self.behaviours.append((0, -inc, inc, 8 * (inc - 1) + 4))
+            self.behaviours.append((inc, 0, inc))
+            self.behaviours.append((-inc, 0, inc))
+            self.behaviours.append((0, inc, inc))
+            self.behaviours.append((0, -inc, inc))
             magnitude = coeff * inc
-            self.behaviours.append((inc, inc, magnitude, 8 * (inc - 1) + 5))
-            self.behaviours.append((-inc, -inc, magnitude, 8 * (inc - 1) + 6))
-            self.behaviours.append((inc, -inc, magnitude, 8 * (inc - 1) + 7))
-            self.behaviours.append((-inc, inc, magnitude, 8 * (inc - 1) + 8))
+            self.behaviours.append((inc, inc, magnitude))
+            self.behaviours.append((-inc, -inc, magnitude))
+            self.behaviours.append((inc, -inc, magnitude))
+            self.behaviours.append((-inc, inc, magnitude))
 
         self.time = dt.now()
         if seed is not None:

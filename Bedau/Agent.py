@@ -7,31 +7,25 @@ class Agent():
         if orig is None:
             # current location: x
             self.position = world.random_location()
-            self.sensory_state = 0              # current sensory state: s
-            self.resources = 250.               # current reservoir of resources: E
-            # update loc: loc' = loc + behav
-            self.current_behaviour = (0, 0, 0)
+            self.resources = 250.  # current reservoir of resources: E
             # mutation rate of sensor_map's loci: μ
             self.mutation_rate = mutation_parameters[0]
             self.meta_mutation = mutation_parameters[1]
             self.meta_mutation_range = mutation_parameters[2]
-            self.sensory_motor_map = []     # sensory motor map: φ
+            self.sensory_motor_map = []  # sensory motor map: φ
             self.behaviours = behaviours
             self.world = world
             self.random_source = random_source
             self.log = log
             for i in range(0, 1024):
-                index = self.random_source.randint(len(behaviours))
-                pick = behaviours[index]
+                pick = self.random_source.randint(len(behaviours))
                 # initialize the log with stats of the initial population
-                self.log[i, pick[3], 0] += 1
+                self.log[i, pick, 0] += 1
                 self.sensory_motor_map.append(pick)
         else:
             # copy constructor
             self.position = orig.position
-            self.sensory_state = orig.sensory_state
             self.resources = orig.resources
-            self.current_behaviour = orig.current_behaviour
             self.mutation_rate = orig.mutation_rate
             self.meta_mutation = orig.meta_mutation
             self.meta_mutation_range = orig.meta_mutation_range
@@ -56,12 +50,12 @@ class Agent():
             if self.random_source.rand(1) < self.mutation_rate:
                 new_behaviour = behaviour
                 while(new_behaviour is behaviour):
-                    pick = self.random_source.randint(len(self.behaviours))
-                    new_behaviour = self.behaviours[pick]
-                    self.log[idx, new_behaviour[3], iteration] += 1
+                    new_behaviour = self.random_source.randint(
+                        len(self.behaviours))
+                    self.log[idx, new_behaviour, iteration] += 1
                 new_sensory_motor_map.append(new_behaviour)
             else:
-                self.log[idx, behaviour[3], iteration] += 1
+                self.log[idx, behaviour, iteration] += 1
                 new_sensory_motor_map.append(behaviour)
         child.sensory_motor_map = new_sensory_motor_map
 
@@ -73,18 +67,15 @@ class Agent():
 
         return child
 
-    def update_resources(self):
-        self.resources += self.world.probe(self.position) - \
-            20 - self.current_behaviour[2]
-
     def update(self, iteration):
-        self.sensory_state = self.world.get_sensory_state(self.position)
-        self.current_behaviour = self.sensory_motor_map[self.sensory_state]
-        self.move(self.position, self.current_behaviour)
-        self.update_resources()
+        sensory_state = self.world.get_sensory_state(self.position)
+        current_behaviour = self.sensory_motor_map[sensory_state]
+        self.move(self.position, self.behaviours[current_behaviour])
+        self.resources += self.world.probe(self.position) \
+            - 20 - self.behaviours[current_behaviour][2]
         if self.resources <= 0:
             for idx, behaviour in enumerate(self.sensory_motor_map):
-                self.log[idx, behaviour[3], iteration] -= 1
+                self.log[idx, behaviour, iteration] -= 1
             return False, None
         if self.resources >= 500:
             return True, self.reproduce(iteration)
