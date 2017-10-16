@@ -14,10 +14,12 @@ class Log():
         self.track_residual = []
         self.track_mutations = []
         self.track_sensory = np.zeros((1024, 121, self.iterations))
+        self.slice_support = np.arange(1024)
         self.time = dt.now()
 
-    def log_sensory(self, sensory_state, behaviour, iteration, val):
-        self.track_sensory[sensory_state, behaviour, iteration] += val
+    def log_sensory(self, sensory_motor_map, iteration, val):
+        self.track_sensory[self.slice_support,
+                           sensory_motor_map, iteration] += val
 
     def copy_state(self, iteration):
         if iteration > 0:

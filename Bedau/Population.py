@@ -62,7 +62,6 @@ class Population():
             if len(self.population) == 0:
                 break
         print("\nSeed: {}\n".format(self.seed))
-        print(self.log)
         return self.log
 
     def update_pop(self, iteration):
