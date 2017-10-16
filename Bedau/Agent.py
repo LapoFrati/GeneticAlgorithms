@@ -20,7 +20,7 @@ class Agent():
             for i in range(0, 1024):
                 pick = self.random_source.randint(len(behaviours))
                 # initialize the log with stats of the initial population
-                self.log[i, pick, 0] += 1
+                self.log.log_sensory(i, pick, 0, 1)
                 self.sensory_motor_map.append(pick)
         else:
             # copy constructor
@@ -52,10 +52,10 @@ class Agent():
                 while(new_behaviour is behaviour):
                     new_behaviour = self.random_source.randint(
                         len(self.behaviours))
-                    self.log[idx, new_behaviour, iteration] += 1
+                    self.log.log_sensory(idx, new_behaviour, iteration, 1)
                 new_sensory_motor_map.append(new_behaviour)
             else:
-                self.log[idx, behaviour, iteration] += 1
+                self.log.log_sensory(idx, behaviour, iteration, 1)
                 new_sensory_motor_map.append(behaviour)
         child.sensory_motor_map = new_sensory_motor_map
 
@@ -75,7 +75,7 @@ class Agent():
             - 20 - self.behaviours[current_behaviour][2]
         if self.resources <= 0:
             for idx, behaviour in enumerate(self.sensory_motor_map):
-                self.log[idx, behaviour, iteration] -= 1
+                self.log.log_sensory(idx, behaviour, iteration, -1)
             return False, None
         if self.resources >= 500:
             return True, self.reproduce(iteration)
