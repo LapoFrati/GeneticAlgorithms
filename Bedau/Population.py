@@ -7,7 +7,7 @@ import random
 
 
 class Population():
-    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq, iterations, plotting=False, seed=None):
+    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq, iterations, plotting=False, seed=None, progress=False):
         print("Generating population")
         self.world_size = world_size
         # mutation rate: μ
@@ -19,6 +19,7 @@ class Population():
         # possible behaviours are 1-15 steps in 8 compass direction + (0,0)
         self.behaviours = [(0, 0, 0, 0)]
         self.resource_freq = resource_freq
+        self.progress = progress
         coeff = math.sqrt(2)
         for inc in range(1, 16):
             self.behaviours.append((inc, 0, inc))
@@ -79,8 +80,9 @@ class Population():
     def stats(self, iteration):
         residual, pop_size, mean_mut = self.log.log_stats(
             self.world, self.population)
-        print("---------------------")
-        print("Iteration: {}".format(iteration))
-        print("Pop size: {}".format(pop_size))
-        print("Residual resource: {}".format(residual))
-        print("Mean mutation: {}".format(mean_mut))
+        if self.progress:
+            print("---------------------")
+            print("Iteration: {}".format(iteration))
+            print("Pop size: {}".format(pop_size))
+            print("Residual resource: {}".format(residual))
+            print("Mean mutation: {}".format(mean_mut))

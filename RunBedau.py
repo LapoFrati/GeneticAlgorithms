@@ -19,7 +19,8 @@ def main():
                          meta_mutation_range=meta_mutation_range,
                          resource_freq=resource_freq,
                          iterations=iterations,
-                         plotting=plotting).evolve()
+                         plotting=plotting,
+                         progress=True).evolve()
 
     if plotting:
         pop_log.plot_world()

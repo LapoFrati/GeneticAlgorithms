@@ -86,7 +86,7 @@ class Log():
             ax.spines['right'].set_visible(False)
             # set vertical dashed lines to better check values across plots
             ax.grid(True, axis='x', linestyle='dashed')
-            ax.get_yaxis().set_label_coords(-0.2, 0.5)
+            ax.get_yaxis().set_label_coords(-0.17, 0.5)
 
         # show x axis values only on last plot
         plt.setp([a.get_xticklabels() for a in axarr[:-1]], visible=False)
