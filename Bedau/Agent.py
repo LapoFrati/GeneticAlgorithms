@@ -1,10 +1,11 @@
 import copy
 import numpy as np
+import random
 
 
 class Agent():
 
-    def __init__(self, world_size=None, behaviours=None, mutation_parameters=None, world=None, random_source=None, log=None, orig=None):
+    def __init__(self, world_size=None, behaviours=None, mutation_parameters=None, color=None, world=None, random_source=None, log=None, orig=None):
         if orig is None:
             # current location: x
             self.position = world.random_location()
@@ -12,8 +13,8 @@ class Agent():
             # mutation rate of sensor_map's loci: μ
             self.mutation_rate = mutation_parameters[0]
             self.meta_mutation = mutation_parameters[1]
-            self.meta_mutation_range = mutation_parameters[2]
             self.random_source = random_source
+            self.color = random.randint(0, 1)
             self.behaviours = behaviours
             self.sensory_motor_map = self.random_source.randint(
                 121, size=1024, dtype='int8')  # sensory motor map: φ
@@ -27,7 +28,7 @@ class Agent():
             self.resources = orig.resources
             self.mutation_rate = orig.mutation_rate
             self.meta_mutation = orig.meta_mutation
-            self.meta_mutation_range = orig.meta_mutation_range
+            self.color = orig.color
             self.sensory_motor_map = np.array(orig.sensory_motor_map)
             self.behaviours = orig.behaviours
             self.world = orig.world
@@ -52,10 +53,16 @@ class Agent():
 
         # mutate the mutation rate
         if(self.random_source.rand(1) < self.meta_mutation):
-            child.mutation_rate = self.random_source.uniform(
-                max(0, self.mutation_rate - self.meta_mutation_range),
-                min(1, self.mutation_rate + self.meta_mutation_range))
-
+            if(self.random_source.rand(1) < 1/5):
+                child.mutation_rate = 0.0001
+            elif(1/5 <= self.random_source.rand(1) >= 2/5):
+                child.mutation_rate = 0.001
+            elif(2/5 < self.random_source.rand(1) >= 3/5):
+                child.mutation_rate = 0.01
+            elif(3/5 < self.random_source.rand(1) >= 4/5):
+                child.mutation_rate = 0.1
+            else:
+                child.mutation_rate = 1
         return child
 
     def update(self, iteration):

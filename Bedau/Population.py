@@ -7,7 +7,7 @@ import random
 
 
 class Population():
-    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, meta_mutation_range, resource_freq, iterations, plotting=False, seed=None, progress=False):
+    def __init__(self, world_size, pop_size, mutation_rate, meta_mutation, resource_freq, iterations, plotting=False, seed=None, progress=False):
         print("Generating population")
         self.world_size = world_size
         # mutation rate: μ
@@ -15,8 +15,6 @@ class Population():
         # mutation rate of mutation: μ_μ
         self.meta_mutation = meta_mutation
         # mutation rate varies in [μ-ε,μ+ε]: ε
-        self.meta_mutation_range = meta_mutation_range
-        # possible behaviours are 1-15 steps in 8 compass direction + (0,0)
         self.behaviours = [(0, 0, 0, 0)]
         self.resource_freq = resource_freq
         self.progress = progress
@@ -46,7 +44,7 @@ class Population():
                 Agent(world_size=self.world_size,
                       behaviours=self.behaviours,
                       mutation_parameters=(
-                          self.mutation_rate, self.meta_mutation, self.meta_mutation_range),
+                          self.mutation_rate, self.meta_mutation),
                       world=self.world,
                       random_source=self.random_source,
                       log=self.log))
@@ -78,11 +76,17 @@ class Population():
         self.population = new_pop
 
     def stats(self, iteration):
-        residual, pop_size, mean_mut = self.log.log_stats(
-            self.world, self.population)
+        residual, pop_size, color, mean_mut, mutations_low, mutations_high, mutations_middle, mutations_lowest, mutations_highest = self.log.log_stats(
+            self.world, self.population, self.population, self.population, self.population, self.population, self.population, self.population)
         if self.progress:
             print("---------------------")
             print("Iteration: {}".format(iteration))
             print("Pop size: {}".format(pop_size))
             print("Residual resource: {}".format(residual))
+            print("Color: {}".format(color))
             print("Mean mutation: {}".format(mean_mut))
+            print("lowest {}".format(mutations_lowest))
+            print("low {}".format(mutations_low))
+            print("middle {}".format(mutations_middle))
+            print("high {}".format(mutations_high))
+            print("highest {}".format(mutations_highest))

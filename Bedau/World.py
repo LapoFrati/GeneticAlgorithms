@@ -1,6 +1,7 @@
 import typing as tp
 import numpy as np
 Location = tp.Tuple[int, int]
+from Bedau.Agent import Agent
 
 
 class World():
@@ -19,14 +20,26 @@ class World():
         """
         Generates a new pyramid of resources centered a the loc
         """
-        for dx in range(-8, 8):
-            for dy in range(-8, 8):
-                distance = abs(dx) + abs(dy)
-                if distance < 8:
-                    resource = 255 * (1 - distance / 8)
-                else:
-                    resource = 0.
-                self.set((loc[0] + dx, loc[1] + dy), resource)
+        if(self.random_source.rand(1) < 0.5):
+            for dx in range(-8, 8):
+                for dy in range(-8, 8):
+                    distance = abs(dx) + abs(dy)
+                    if distance < 8:
+                        resource = 255 * (1 - distance / 8)
+                        pyramid_color = 1
+                    else:
+                        resource = 0.
+                    self.set((loc[0] + dx, loc[1] + dy), resource)
+        else:
+            for dx in range(-8, 8):
+                for dy in range(-8, 8):
+                    distance = abs(dx) + abs(dy)
+                    if distance < 8:
+                        resource = 255 * (1 - distance / 8)
+                        pyramid_color = 0
+                    else:
+                        resource = 0.
+                    self.set((loc[0] + dx, loc[1] + dy), resource)
 
     def sense(self, loc: Location):
         """
@@ -85,10 +98,14 @@ class World():
                                              self.world_size] += increment
 
     def probe(self, loc):
-        resource_available = self.get(loc)
-        resource_to_collect = min(resource_available, 100)
-        self.set(loc, -resource_to_collect)
-        return resource_to_collect
+        #if agent.color == pyramid_color:
+            resource_available = self.get(loc)
+            resource_to_collect = min(resource_available, 100)
+            self.set(loc, -resource_to_collect)
+            return resource_to_collect
+        #else:
+            #resource_to_collect = 0
+            #return resource_to_collect
 
     def print_world(self):
         for row in self.world:

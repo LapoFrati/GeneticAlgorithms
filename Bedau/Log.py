@@ -12,7 +12,13 @@ class Log():
         self.track_world = []
         self.track_population = []
         self.track_residual = []
+        self.track_color = []
         self.track_mutations = []
+        self.track_mutation_rates_high= []
+        self.track_mutation_rates_highest= []
+        self.track_mutation_rates_lowest= []
+        self.track_mutation_rates_low= []
+        self.track_mutation_rates_middle= []
         self.track_sensory = np.zeros((1024, 121, self.iterations))
         self.slice_support = np.arange(1024)
 
@@ -25,11 +31,17 @@ class Log():
             self.track_sensory[:, :,
                                iteration] = self.track_sensory[:, :, iteration - 1]
 
-    def log_stats(self, world, population):
+    def log_stats(self, world, population, color, mutations_high, mutations_low, mutations_middle, mutations_highest, mutations_lowest):
         residual = world.residual_resource()
         self.track_residual.append(residual)
         pop_size = len(population)
         self.track_population.append(pop_size)
+        color = 0
+        mutations_high = 0
+        mutations_highest = 0
+        mutations_low = 0
+        mutations_lowest = 0
+        mutations_middle = 0
         mean_mut = 0.
         temp = []
         for agent in population:
@@ -37,11 +49,31 @@ class Log():
             if self.plot_world_flag:
                 temp.append((agent.position[1], agent.position[0]))
         mean_mut /= pop_size
+        for agent in population:
+            if agent.mutation_rate == 1:
+                mutations_highest += 1
+            elif agent.mutation_rate == 0.1:
+                mutations_high += 1
+            elif agent.mutation_rate == 0.01:
+                mutations_middle += 1
+            elif agent.mutation_rate == 0.001:
+                mutations_low += 1
+            else:
+                mutations_lowest += 1
+        for agent in population:
+            if agent.color == 1:
+                color += 1
+        self.track_color.append(color)
         self.track_mutations.append(mean_mut)
+        self.track_mutation_rates_highest.append(mutations_highest)
+        self.track_mutation_rates_high.append(mutations_high)
+        self.track_mutation_rates_low.append(mutations_low)
+        self.track_mutation_rates_lowest.append(mutations_lowest)
+        self.track_mutation_rates_middle.append(mutations_middle)
         if self.plot_world_flag:
             locations = np.array(temp)
             self.track_world.append((np.array(world.world), locations))
-        return residual, pop_size, mean_mut
+        return residual, pop_size, color, mean_mut, mutations_low, mutations_high, mutations_middle, mutations_lowest, mutations_highest
 
     def plot_world(self):
         fig, ax = plt.subplots()
@@ -76,8 +108,12 @@ class Log():
         axarr[0].set_ylabel('Residual resources')
         axarr[1].plot(x, self.track_population)
         axarr[1].set_ylabel('Pop. size')
-        axarr[2].plot(x, self.track_mutations)
-        axarr[2].set_ylabel('Avg mut. rate')
+        axarr[2].plot(x, self.track_mutation_rates_high, 'r')
+        axarr[2].plot(x, self.track_mutation_rates_highest, 'k')
+        axarr[2].plot(x, self.track_mutation_rates_lowest, 'y')
+        axarr[2].plot(x, self.track_mutation_rates_middle, 'b')
+        axarr[2].plot(x, self.track_mutation_rates_low, 'g')
+        axarr[2].set_ylabel('Mutation rates')
         axarr[2].set_xlabel('Iterations')
 
         for ax in axarr:
