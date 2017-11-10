@@ -19,14 +19,26 @@ class Log():
         self.track_mutation_rates_lowest= []
         self.track_mutation_rates_low= []
         self.track_mutation_rates_middle= []
+        # for each iteration save the distribution of the behaviours as a matrix
+        # sensory_state x behaviour x iteration
         self.track_sensory = np.zeros((1024, 121, self.iterations))
         self.slice_support = np.arange(1024)
 
     def log_sensory(self, sensory_motor_map, iteration, val):
+        # assumes sensory_motor_map is of length 1024 and with values 0-120
+        # e.g. with 5 sensory states, 3 behaviours & slice_support=[0,1,2,3,4]
+        # if the log is empty and sensory_motor_map = [0,0,1,1,2] & val = 1
+        #  0 0 0   -->  1 0 0
+        #  0 0 0        1 0 0
+        #  0 0 0        0 1 0
+        #  0 0 0        0 1 0
+        #  0 0 0        0 0 1
         self.track_sensory[self.slice_support,
                            sensory_motor_map, iteration] += val
 
     def copy_state(self, iteration):
+        # copy the previous sensory_state/behaviours distribution to update it
+        # with new values
         if iteration > 0:
             self.track_sensory[:, :,
                                iteration] = self.track_sensory[:, :, iteration - 1]
