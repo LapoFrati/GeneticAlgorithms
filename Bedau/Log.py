@@ -28,11 +28,11 @@ class Log():
         # assumes sensory_motor_map is of length 1024 and with values 0-120
         # e.g. with 5 sensory states, 3 behaviours & slice_support=[0,1,2,3,4]
         # if the log is empty and sensory_motor_map = [0,0,1,1,2] & val = 1
-        #  0 0 0   -->  1 0 0
-        #  0 0 0        1 0 0
-        #  0 0 0        0 1 0
-        #  0 0 0        0 1 0
-        #  0 0 0        0 0 1
+        #  0 0 0   -->  1 0 0  [0,0] += 1       The slice_support is used to 
+        #  0 0 0        1 0 0  [1,0] += 1       distribute the values over the
+        #  0 0 0        0 1 0  [2,1] += 1       lenght of the matrix
+        #  0 0 0        0 1 0  [3,1] += 1
+        #  0 0 0        0 0 1  [4,2] += 1
         self.track_sensory[self.slice_support,
                            sensory_motor_map, iteration] += val
 
