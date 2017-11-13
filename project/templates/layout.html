@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+
+        <title>Evolution of mutation rates</title>
+        <!-- Solar theme from https://www.bootstrapcdn.com -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/solar/bootstrap.min.css" rel="stylesheet"/>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button aria-expanded="false" class="navbar-toggle collapsed" data-target="#navbar" data-toggle="collapse" type="button">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="{{ url_for('index') }}"><span class="blue">Evolution</span></a>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="navbar">
+                        <ul class="nav navbar-nav">
+                            <li><a href="{{ url_for('find') }}">Finding optimal mutation rates</a></li>
+                            <li><a href="{{ url_for('find') }}">Evolving mutation rates</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <main>
+                {% block main %}{% endblock %}
+            </main>
+
+        </div>
+
+    </body>
+
+</html>

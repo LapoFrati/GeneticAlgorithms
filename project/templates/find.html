@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Find
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('find') }}" method="post">
+        <fieldset>
+            <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="pop_size" placeholder="Population size" type="text"/>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-default" type="submit">Submit</button>
+            </div>
+        </fieldset>
+        <div class="progress progress-striped">
+          <div class="progress-bar progress-bar-warning" style="width: 60%"></div>
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Found
+{% endblock %}
+
+{% block main %}
+  <form action="{{ url_for('found') }}" method="post">
+    <p>
+        Hello!
+    </p>
+    <p>
+        Your final population size is: {{pop_size}}.
+        Click below to see results.
+    </p>
+    <fieldset>
+        <div class="form-group">
+            <button class="btn btn-default" type="submit">Get results</button>
+        </div>
+    </fieldset>
+    <div class="progress progress-striped">
+      <div class="progress-bar progress-bar-warning" style="width: 60%"></div>
+    </div>
+  </form>
+{% endblock %}
