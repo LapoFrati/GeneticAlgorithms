@@ -28,6 +28,7 @@ Session(app)
 def index():
     return render_template("index.html")
 
+
 @app.route("/found", methods=["GET", "POST"])
 def found():
     if request.method == "POST":
@@ -35,18 +36,20 @@ def found():
     else:
         return render_template("found.html")
 
+
 def escape(s):
-        for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
-            ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
-            s = s.replace(old, new)
-        return s
+    for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
+                     ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
+        s = s.replace(old, new)
+    return s
+
 
 def extinct(top="", bottom=""):
     return render_template("extinct.html", top=escape(top), bottom=escape(bottom))
 
+
 def overpop(top="", bottom=""):
     return render_template("overpop.html", top=escape(top), bottom=escape(bottom))
-
 
 
 @app.route("/find", methods=["GET", "POST"])
@@ -74,22 +77,20 @@ def find():
                 plotting = True
                 iterations = 100
                 pop_log = Population(world_size=world_size,
-                                    pop_size=pop_size,
-                                    mutation_rate=mutation_rate,
-                                    meta_mutation=meta_mutation,
-                                    meta_mutation_range=meta_mutation_range,
-                                    resource_freq=resource_freq,
-                                    iterations=iterations,
-                                    plotting=plotting,
-                                    progress=True).evolve()
+                                     pop_size=pop_size,
+                                     mutation_rate=mutation_rate,
+                                     meta_mutation=meta_mutation,
+                                     meta_mutation_range=meta_mutation_range,
+                                     resource_freq=resource_freq,
+                                     iterations=iterations,
+                                     plotting=plotting,
+                                     progress=True).evolve()
                 if plotting:
                     pop_log.plot_world()
                     pop_log.plot_stats()
 
-
             main()
-
-            return render_template("found.html", pop_size = pop_size_got)
+            return render_template("found.html", pop_size=pop_size_got)
 
     else:
         return render_template("find.html")

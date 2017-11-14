@@ -5,6 +5,7 @@ from datetime import datetime as dt
 import numpy as np
 import pylab
 
+
 class Log():
     def __init__(self, iterations, plot_world_flag=False):
         self.iterations = iterations
@@ -63,7 +64,7 @@ class Log():
         anim = animation.FuncAnimation(fig, animate, frames=len(
             self.track_world), interval=300, blit=True, init_func=init, repeat=False)
         time = dt.now()
-        path_to_save = 'simulation' + '.mp4'
+        path_to_save = 'static/videos/simulation.mp4'
         print('Plotting track_world to ' + path_to_save)
         anim.save(path_to_save, fps=5, dpi=300,
                   extra_args=['-vcodec', 'libx264'])
@@ -92,7 +93,7 @@ class Log():
         plt.setp([a.get_xticklabels() for a in axarr[:-1]], visible=False)
         if save_stats:
             time = dt.now()
-            path_to_save = 'graph' + '.pdf'
+            path_to_save = 'static/images/graph.png'
             print('Plotting stats to ' + path_to_save)
             pylab.savefig(path_to_save)   # save the figure to file
             plt.close()

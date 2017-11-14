@@ -104,3 +104,5 @@ ENV/
 *.mp4
 
 \.DS_Store
+
+*.png

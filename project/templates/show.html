@@ -8,6 +8,6 @@
     <p>
         Here is your simulation and graphs.
     </p>
-    <video width="560" height="340" controls> <source src="https://www.youtube.com/embed/P2pjbwM3KjI" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'></video>
-    <iframe id="iframepdf" src="graph.pdf"></iframe>
+    <video width="560" height="340" controls> <source src="{{ url_for('static', filename='videos/simulation.mp4')}}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'></video>
+    <img src="{{ url_for('static', filename='images/graph.png')}}"></img>
 {% endblock %}
