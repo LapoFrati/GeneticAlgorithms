@@ -76,9 +76,9 @@ class Log():
         axarr[0].plot(x, self.track_residual)
         axarr[0].set_ylabel('Residual resources')
         axarr[1].plot(x, self.track_population)
-        axarr[1].set_ylabel('Pop. size')
+        axarr[1].set_ylabel('Population size')
         axarr[2].plot(x, self.track_mutations)
-        axarr[2].set_ylabel('Avg mut. rate')
+        axarr[2].set_ylabel('Mutation rate')
         axarr[2].set_xlabel('Iterations')
 
         for ax in axarr:
@@ -95,7 +95,8 @@ class Log():
             time = dt.now()
             path_to_save = 'static/images/graph.png'
             print('Plotting stats to ' + path_to_save)
-            pylab.savefig(path_to_save)   # save the figure to file
+            # pylab.savefig(path_to_save)   # save the figure to file
+            plt.savefig(path_to_save, bbox_inches='tight')
             plt.close()
             print('Plotting Finished')
         else:

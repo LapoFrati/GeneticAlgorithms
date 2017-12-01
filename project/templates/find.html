@@ -7,15 +7,34 @@
 {% block main %}
     <form action="{{ url_for('find') }}" method="post">
         <fieldset>
+          <p>Calculated the optimal mutation rate by running the simulation with different starting values of population size and mutation rates. Make sure to run multiple times so you can compare the resulting fitness (residual resources). Remember the mutation rate that resulted in the highest fitness, as this is the optimal one. When you are done with this section, move to the evolve section, where you can test whether natural selection would find this value!</p>
+
+          <p>Be careful! If the population size is too small, they can easily go extinct before the simulation end. In this case you will get an error message. If this happens just return to this site and try again with a higher number of individuals.</p>
+          <p><strong>Type in initial populaion size: </strong></p>
             <div class="form-group">
                 <input autocomplete="off" autofocus class="form-control" name="pop_size" placeholder="Population size" type="text"/>
+            </div>
+            <!-- <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="mutation_rate" placeholder="Mutation rate" type="text"/>
+            </div> -->
+            <p>Make sure to try multiple rates before moving on to the next step!</p>
+            <div class="form-group">
+              <label for="mutation_rate">Select mutation rate</label>
+              <select class="form-control" name="mutation_rate">
+                <option value="0.0001">0.0001</option>
+                <option value="0.001">0.001</option>
+                <option value="0.01">0.01</option>
+                <option value="0.1">0.1</option>
+                <option value="1">1</option>
+              </select>
             </div>
             <div class="form-group">
                 <button class="btn btn-default" type="submit">Submit</button>
             </div>
+            <p> This simulation should take less than 1 minutes. Please be patient! </p>
+            <p style="text-align: center;"><img src="{{ url_for('static', filename='images/evolution.gif')}}"></img></p>
+
         </fieldset>
-        <div class="progress progress-striped">
-          <div class="progress-bar progress-bar-warning" style="width: 60%"></div>
-        </div>
+
     </form>
 {% endblock %}

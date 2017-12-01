@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Evolve
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('evolve') }}" method="post">
+        <fieldset>
+            <p>This is where the magic happens! Let the mutation rate itself to mutate (with the rate of the meta-mutation rate). Choose a population size, a starting mutation rate and also a meta-mutation rate this time. Do you get what you expect?</p>
+            <p>Be careful! If the population size is too small, they can easily go extinct before the simulation end. In this case you will get an error message. If this happens just return to this site and try again with a higher number of individuals.</p>
+            <p><strong>Type in initial populaion size: </strong></p>
+            <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="pop_size" placeholder="Population size" type="text"/>
+            </div>
+            <p>Will it result in the same mutation rate over time with a different starting point? Try it with different values and compare!</p>
+            <div class="form-group">
+              <label for="mutation_rate">Select mutation rate</label>
+              <select class="form-control" name="mutation_rate">
+                <option value="0.001">0.001</option>
+                <option value="0.01">0.01</option>
+                <option value="0.1">0.1</option>
+                <option value="1">1</option>
+              </select>
+            </div>
+            <p>What effect does the value of the meta-mutation rate have on the evolution of mutation rate? Try it with different values and compare!</p>
+            <div class="form-group">
+              <label for="meta_mutation">Select meta-mutation rate</label>
+              <select class="form-control" name="meta_mutation">
+                <option value="0.33">0.33</option>
+                <option value="0.66">0.66</option>
+                <option value="1">1</option>
+              </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-default" type="submit">Submit</button>
+            </div>
+            <p> This simulation should take about 2 minutes. Be patient! </p>
+            <p style="text-align: center;"><img src="{{ url_for('static', filename='images/evolution.gif')}}"></img></p>
+
+        </fieldset>
+    </form>
+{% endblock %}

@@ -5,10 +5,16 @@
 {% endblock %}
 
 {% block main %}
-        <iframe title='YouTube video player' class='youtube-player' type='text/html'
-        width='425' height='344'
-        src="https://www.youtube.com/embed/P2pjbwM3KjI"
-        type='application/x-shockwave-flash'
-        allowscriptaccess='always' allowfullscreen='true'
-        frameborder='0'></iframe>
+        <h1 style="text-align: center;">Welcome!</h1>
+        <p style="text-align: center;">&nbsp;</p>
+        <h3 style="text-align: center;">This website was built to create a user-friendly interface for a genetic algorithm that simulates the evolution of mutation rates. This simulation can be a&nbsp;base for answering questions on the evolution of evolvability for scientists, and it provides an interactive site for non-scientist interested in the topic.</h3>
+        <p style="text-align: center;">&nbsp;</p>
+        <h3 style="text-align: center;">In its current state, you can use this site to:</h3>
+        <ul>
+        <li> <font size="4"><a href="learnmore">Learn</a> more about mutations, mutation rates and the reasons why this topic is so controversial </font></li>
+        <li> <font size="4"><a href="find">Find</a> the optimal mutation rate of the population of virtual agents and observe the outcome </font></li>
+        <li> <font size="4"><a href="evolve">Evolve</a> the mutation rate itself to see whether the population can find the optimal one </font></li>
+        <li> <font size="4"><a href="see">Explore</a> the topic with us! Look at the questions we are currently trying to answer. </font></li>
+        </ul>
+        <p style="text-align: center;"><img src="{{ url_for('static', filename='images/medium.gif')}}"></img></p>
 {% endblock %}

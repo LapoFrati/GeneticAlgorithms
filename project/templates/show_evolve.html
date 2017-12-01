@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Show
+{% endblock %}
+
+{% block main %}
+    <h3>
+        Here are your graphs. Take a look at the level of residuals and population size.
+        Compare these with your previous and future results!
+    </h3>
+    <div>
+      <img src="{{ url_for('static', filename='images/graph.png')}}" align="left"></img>
+      <video width="550" height="330" align="left" controls> <source src="{{ url_for('static', filename='videos/simulation.mp4')}}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'></video>
+    </div>
+{% endblock %}

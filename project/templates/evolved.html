@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Found
+    Evolved
 {% endblock %}
 
 {% block main %}
-  <form action="{{ url_for('found') }}" method="post">
+  <form action="{{ url_for('evolved') }}" method="post">
     <h3>
         Hello fellow researcher! :)
     </h3>
@@ -16,13 +16,15 @@
         Your initial mutation rate was: {{mutation_rate}}.
     </h4>
     <h4>
+        Your initial meta-mutation rate was: {{meta_mutation}}.
+    </h4>
+    <h4>
         Now click below to see results!
     </h4>
     <fieldset>
         <div class="form-group">
             <button class="btn btn-default" type="submit">Get results</button>
         </div>
-        <p style="text-align: center;"><img src="{{ url_for('static', filename='images/finally.jpg')}}"></img></p>
     </fieldset>
   </form>
 {% endblock %}
